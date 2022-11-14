@@ -28,7 +28,7 @@ def log():
     # write errors
     for idx, code in enumerate(ISSUES['error'].keys()):
         with open('error.md', 'a') as file:
-            file.write(f'Error {idx + 1}: [Code {code}]')
+            file.write(f'Error {idx + 1}: {code}\n')
 
             for value in ISSUES['error'][code]:
                 file.write(value)

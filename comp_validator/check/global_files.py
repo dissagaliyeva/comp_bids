@@ -39,7 +39,6 @@ class GlobalFiles:
 
         for idx, file in enumerate([self.readme, self.changes, self.participants_json, self.participants_tsv]):
             if file is None:
-                # val.write_error(error_values[idx], os.path.join(self.path, GLOBAL_FILES[idx]))
                 utils.add_error(error_values[idx], self.path, GLOBAL_FILES[idx])
 
     def check_readme(self):

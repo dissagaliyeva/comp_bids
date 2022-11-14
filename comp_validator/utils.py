@@ -7,14 +7,8 @@ def add_error(code, path, fname, evidence=None):
     name, severity, reason = issue['key'], issue['severity'], issue['reason']
     end = '\n=============================\n\n'
 
-    # if len(val.ISSUES[severity]) > 0 and code not in val.ISSUES[severity]:
-    #     if severity == 'error':
-    #         val.ERROR += 1
-    #     else:
-    #         val.WARNING += 1
-
     # append new issue
-    code_name = f'[Code {code}] {name}'
+    code_name = f'[Code {code}] {name}\n'
 
     if code_name not in val.ISSUES[severity]:
         val.ISSUES[severity] = {}
