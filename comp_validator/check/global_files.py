@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import os
 import re
@@ -8,7 +10,7 @@ from comp_validator import comp_validator as val
 from comp_validator import utils
 
 
-GLOBAL_FILES = ['README', 'CHANGES', 'participants.json', 'participants.tsv']
+GLOBAL_FILES = ['README', 'CHANGES', 'participants.json', 'participants.tsv', 'dataset_description.json']
 SPECIES = ['arabidopsis thaliana', 'bos taurus', 'caenorhabditis elegans', 'chlamydomonas reinhardtii',
            'danio rerio (zebrafish)', 'dictyostelium discoideum', 'drosophila melanogaster', 'escherichia coli',
            'homo sapiens', 'mus musculus', 'hepatitis C virus', 'mycoplasma pneumoniae', 'oryza sativa',
@@ -25,6 +27,7 @@ class GlobalFiles:
         self.participants_json = None
         self.participants_tsv = None
         self.changes = None
+        self.dataset_description = None
 
         # iterate over global files
         self.get_files()
@@ -34,13 +37,15 @@ class GlobalFiles:
         self.changes = utils.check_file_exists(self.path, 'CHANGES')
         self.participants_tsv = utils.check_file_exists(self.path, 'participants.tsv')
         self.participants_json = utils.check_file_exists(self.path, 'participants.json')
+        self.dataset_description = utils.check_file_exists(self.path, 'dataset_description.json')
 
         self.check_files()
 
     def check_files(self):
-        error_values = [2, 4, 3, 3]
+        error_values = [2, 4, 3, 3, 15]
 
-        for idx, file in enumerate([self.readme, self.changes, self.participants_json, self.participants_tsv]):
+        for idx, file in enumerate([self.readme, self.changes, self.participants_json,
+                                    self.participants_tsv, self.dataset_description]):
             if file is None:
                 utils.add_error(error_values[idx], self.path, GLOBAL_FILES[idx])
             else:
@@ -50,8 +55,10 @@ class GlobalFiles:
                     self.check_changes()
                 elif idx == 2:
                     self.check_participants_json()
-                else:
+                elif idx == 3:
                     self.check_participants_tsv()
+                else:
+                    self.check_dataset_desc()
 
     def check_readme(self):
         ext = self.readme.split('.')[-1]
@@ -69,7 +76,27 @@ class GlobalFiles:
         self.check_content(self.changes)
 
     def check_participants_json(self):
-        pass
+        file = json.load(open(self.participants_json))
+        basename = os.path.basename(file)
+
+        if 'age' in file.keys():
+            if 'Description' not in file['age'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Description` field for `age` key. Expected the following structure:\n{\n"age"{\n"Description": "age of the participant",\n"Units": "years"\n}\n}'),
+            if 'Units' not in file['age'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Units` field for `age` key. Expected the following structure:\n{\n"age"{\n"Description": "age of the participant",\n"Units": "years"\n}\n}'),
+
+        if 'sex' in file.keys():
+            if 'Description' not in file['sex'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Description` field for `sex` key. Expected the following structure:\n{\n"sex"{\n"Description": "sex of the participant as reported by the participant",\n"Levels": {\n"M": "male",\n"F": "female"\n}\n}')
+            if 'Levels' not in file['sex'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Levels` field for `sex` key. Expected the following structure:\n{\n"sex"{\n"Description": "sex of the participant as reported by the participant",\n"Levels": {\n"M": "male",\n"F": "female"\n}\n}')
+
+        if 'handedness' in file.keys():
+            if 'Description' not in file['handedness'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Description` field for `handedness` key. Expected the following structure:\n{\n"handedness"{\n"Description": "handedness of the participant as reported by the participant",\n"Levels": {\n"left": "left",\n"right": "right"\n}\n}')
+
+            if 'Levels' not in file['handedness'].keys():
+                utils.add_error(16, self.path, basename, 'Missing `Levels` field for `handedness` key. Expected the following structure:\n{\n"handedness"{\n"Description": "handedness of the participant as reported by the participant",\n"Levels": {\n"left": "left",\n"right": "right"\n}\n}')
 
     def check_participants_tsv(self):
         file = pd.read_csv(self.participants_tsv, sep='\t')
@@ -114,6 +141,9 @@ class GlobalFiles:
                 if content['handedness'] in HANDEDNESS:
                     utils.add_error(14, self.path, basename,
                                     f'Line: {idx}, subject: {content["participant_id"]}, handedness: {content["handedness"]}')
+
+    def check_dataset_desc(self):
+        pass
 
     def check_content(self, file):
         f = open(file).readlines()
