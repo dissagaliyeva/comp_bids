@@ -8,6 +8,11 @@ from comp_validator import utils
 
 
 GLOBAL_FILES = ['README', 'CHANGES', 'participants.json', 'participants.tsv']
+SPECIES = ['arabidopsis thaliana', 'bos taurus', 'caenorhabditis elegans', 'chlamydomonas reinhardtii',
+           'danio rerio (zebrafish)', 'dictyostelium discoideum', 'drosophila melanogaster', 'escherichia coli',
+           'homo sapiens', 'mus musculus', 'hepatitis C virus', 'mycoplasma pneumoniae', 'oryza sativa',
+           'plasmodium falciparum', 'pneumocystis carinii', 'rattus norvegicus', 'saccharomyces cerevisiae',
+           'schizosaccharomyces pombe', 'takifugu rubripes', 'xenopus laevis', 'zea mays']
 
 
 class GlobalFiles:
@@ -81,7 +86,14 @@ class GlobalFiles:
             # check if each participant is correctly named (starts with 'sub-' and ends with alphanumeric values)
             for idx, content in file.iterrows():
                 if len(re.findall(r'sub-[0-9a-zA-Z]+', content['participant_id'], flags=re.IGNORECASE)) == 0:
-                    utils.add_error(9, self.path, basename, f'Line {idx}, subject: {content["participant_id"]}')
+                    utils.add_error(9, self.path, basename, f'Line: {idx}, subject: {content["participant_id"]}')
+
+        # check species if present
+        if 'species' in file.columns:
+            for idx, content in file.iterrows():
+                if content['species'] not in SPECIES:
+                    utils.add_error(10, self.path, basename, f'Line: {idx}, subject: {content["participant_id"]}')
+
 
     def check_content(self, file):
         f = open(file).readlines()
