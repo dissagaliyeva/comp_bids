@@ -1,4 +1,5 @@
 import os
+import re
 
 import pandas as pd
 
@@ -65,10 +66,22 @@ class GlobalFiles:
         pass
 
     def check_participants_tsv(self):
-        file = pd.read_csv(self.participants_tsv)
+        file = pd.read_csv(self.participants_tsv, sep='\t')
+        print(file)
+        basename = os.path.basename(self.participants_tsv)
 
-        if 'participant_id' not in file.columns:
-            utils.add_error(7, self.path, os.path.basename(self.participants_tsv))
+        # check if the required column is present
+        if 'participant_id' not in list(file.columns):
+            utils.add_error(7, self.path, basename)
+        else:
+            # check if each column contains unique id
+            if len(file['participant_id'].unique()) != len(file):
+                utils.add_error(8, self.path, basename)
+
+            # check if each participant is correctly named (starts with 'sub-' and ends with alphanumeric values)
+            for idx, content in file.iterrows():
+                if len(re.findall(r'sub-[0-9a-zA-Z]+', content['participant_id'], flags=re.IGNORECASE)) == 0:
+                    utils.add_error(9, self.path, basename, f'Line {idx}, subject: {content["participant_id"]}')
 
     def check_content(self, file):
         f = open(file).readlines()
