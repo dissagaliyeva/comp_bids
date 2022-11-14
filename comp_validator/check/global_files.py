@@ -14,7 +14,7 @@ SPECIES = ['arabidopsis thaliana', 'bos taurus', 'caenorhabditis elegans', 'chla
            'homo sapiens', 'mus musculus', 'hepatitis C virus', 'mycoplasma pneumoniae', 'oryza sativa',
            'plasmodium falciparum', 'pneumocystis carinii', 'rattus norvegicus', 'saccharomyces cerevisiae',
            'schizosaccharomyces pombe', 'takifugu rubripes', 'xenopus laevis', 'zea mays']
-
+HANDEDNESS = ['left', 'l', 'right', 'r', 'a', 'ambidextrous', 'n/a']
 
 class GlobalFiles:
     def __init__(self, path):
@@ -73,7 +73,6 @@ class GlobalFiles:
 
     def check_participants_tsv(self):
         file = pd.read_csv(self.participants_tsv, sep='\t')
-        print(file)
         basename = os.path.basename(self.participants_tsv)
 
         # check if the required column is present
@@ -110,6 +109,11 @@ class GlobalFiles:
                         utils.add_error(13, self.path, basename,
                                         f'Line: {idx}, subject: {content["participant_id"]}, sex: {content["sex"]}')
 
+            # check if handedness is correctly defined
+            if 'handedness' in content:
+                if content['handedness'] in HANDEDNESS:
+                    utils.add_error(14, self.path, basename,
+                                    f'Line: {idx}, subject: {content["participant_id"]}, handedness: {content["handedness"]}')
 
     def check_content(self, file):
         f = open(file).readlines()
