@@ -36,12 +36,12 @@ class GlobalFiles:
             else:
                 if idx == 0:
                     self.check_readme()
-                elif idx == 1:
-                    self.check_changes()
-                elif idx == 2:
-                    self.check_participants_json()
-                else:
-                    self.check_participants_tsv()
+                # elif idx == 1:
+                #     self.check_changes()
+                # elif idx == 2:
+                #     self.check_participants_json()
+                # else:
+                #     self.check_participants_tsv()
 
     def check_readme(self):
         ext = self.readme.split('.')[-1]
@@ -52,7 +52,7 @@ class GlobalFiles:
         self.check_content(self.readme)
 
     def check_content(self, file):
-        file = open(file).readlines()
+        f = open(file).readlines()
 
-        if len(file) == 0:
-            utils.add_error(5, self.path, file)
+        if len(f) == 0:
+            utils.add_error(5, self.path, os.path.basename(file))
