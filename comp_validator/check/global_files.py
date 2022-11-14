@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import re
 
@@ -88,11 +89,26 @@ class GlobalFiles:
                 if len(re.findall(r'sub-[0-9a-zA-Z]+', content['participant_id'], flags=re.IGNORECASE)) == 0:
                     utils.add_error(9, self.path, basename, f'Line: {idx}, subject: {content["participant_id"]}')
 
-        # check species if present
-        if 'species' in file.columns:
-            for idx, content in file.iterrows():
-                if content['species'] not in SPECIES:
-                    utils.add_error(10, self.path, basename, f'Line: {idx}, subject: {content["participant_id"]}')
+        for idx, content in file.iterrows():
+            # check if species are defined correctly
+            if 'species' in content and content['species'] not in SPECIES:
+                utils.add_error(10, self.path, basename,
+                                f'Line: {idx}, subject: {content["participant_id"]}, species: {content["species"]}')
+
+            # check if age is of correct type
+            if 'age' in content and type(content['age']) != np.int64 or type(content['age']) != np.float64:
+                utils.add_error(11, self.path, basename,
+                                f'Line: {idx}, subject: {content["participant_id"]}, age: {content["age"]}')
+
+            # check if sex of correct type and if defined correctly
+            if 'sex' in content:
+                if type(content['sex']) != str:
+                    utils.add_error(12, self.path, basename,
+                                    f'Line: {idx}, subject: {content["participant_id"]}, sex: {content["sex"]}')
+                else:
+                    if content['sex'].lower() not in ['m', 'male', 'f', 'female', 'o', 'other', 'n/a']:
+                        utils.add_error(13, self.path, basename,
+                                        f'Line: {idx}, subject: {content["participant_id"]}, sex: {content["sex"]}')
 
 
     def check_content(self, file):
