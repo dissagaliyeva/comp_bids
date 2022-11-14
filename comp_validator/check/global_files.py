@@ -143,7 +143,59 @@ class GlobalFiles:
                                     f'Line: {idx}, subject: {content["participant_id"]}, handedness: {content["handedness"]}')
 
     def check_dataset_desc(self):
-        pass
+        file = json.load(open(self.dataset_description))
+        basename = os.path.basename(file)
+
+        if 'Name' not in file.keys():
+            utils.add_error(17, self.path, basename, 'Missing a required field `Name`.')
+
+        if 'Name' in file.keys() and type(file['Name']) != str:
+            utils.add_error(17, self.path, basename, 'A required field `Name` should be of type string.')
+
+        if 'BIDSVersion' not in file.keys():
+            utils.add_error(17, self.path, basename, 'Missing a required field `BIDSVersion`.')
+
+        if 'BIDSVersion' in file.keys() and type(file['BIDSVersion']) != str:
+            utils.add_error(17, self.path, basename, 'A required field `BIDSVersion` should be of type string.')
+
+        if 'HEDVersion' in file.keys() and (type(file['HEDVersion']) != str or type(file['HEDVersion'] != list)):
+            utils.add_error(17, self.path, basename, 'A recommended field `HEDVersion` should be of type string or list of strings.')
+
+        if 'DatasetLinks' in file.keys() and (type(file['DatasetLinks']) != object):
+            utils.add_error(17, self.path, basename, 'A recommended field `DatasetLinks` should be of type object.')
+
+        if 'DatasetType' in file.keys() and type(file['DatasetType']) != str:
+            utils.add_error(17, self.path, basename, 'A recommended field `DatasetType` should be of type string.')
+
+        if 'License' in file.keys() and type(file['License']) != str:
+            utils.add_error(17, self.path, basename, 'A recommended field `License` should be of type string.')
+
+        if 'Authors' in file.keys() and (type(file['Authors']) != list):
+            utils.add_error(17, self.path, basename, 'A recommended field `Authors` should be of type list of strings.')
+
+        if 'Acknowledgements' in file.keys() and type(file['Acknowledgements']) != str:
+            utils.add_error(17, self.path, basename, 'A recommended field `Acknowledgements` should be of type string.')
+
+        if 'HowToAcknowledge' in file.keys() and type(file['HowToAcknowledge']) != str:
+            utils.add_error(17, self.path, basename, 'A recommended field `HowToAcknowledge` should be of type string.')
+
+        if 'Funding' in file.keys() and type(file['Funding']) != list:
+            utils.add_error(17, self.path, basename, 'A recommended field `Funding` should be of type list.')
+
+        if 'EthicsApproval' in file.keys() and type(file['EthicsApproval']) != list:
+            utils.add_error(17, self.path, basename, 'A recommended field `EthicsApproval` should be of type list.')
+
+        if 'ReferencesAndLinks' in file.keys() and type(file['ReferencesAndLinks']) != list:
+            utils.add_error(17, self.path, basename, 'A recommended field `ReferencesAndLinks` should be of type list.')
+
+        if 'DatasetDOI' in file.keys() and type(file['DatasetDOI']) != str:
+            utils.add_error(17, self.path, basename, 'A recommended field `DatasetDOI` should be of type string.')
+
+        if 'GeneratedBy' in file.keys() and type(file['GeneratedBy']) != list:
+            utils.add_error(17, self.path, basename, 'A recommended field `GeneratedBy` should be of type list.')
+
+        if 'SourceDatasets' in file.keys() and type(file['SourceDatasets']) != list:
+            utils.add_error(17, self.path, basename, 'A recommended field `SourceDatasets` should be of type list.')
 
     def check_content(self, file):
         f = open(file).readlines()
