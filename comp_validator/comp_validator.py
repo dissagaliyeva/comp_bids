@@ -41,6 +41,7 @@ def log():
             for value in ISSUES['warning'][code]:
                 file.write(value)
 
+    print(ISSUES)
 
     # for issue in ISSUES.keys():
     #     with open(f'{issue}.txt', 'a') as file:

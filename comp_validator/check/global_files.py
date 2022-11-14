@@ -20,19 +20,14 @@ class GlobalFiles:
         self.get_files()
 
     def get_files(self):
-        for file in os.listdir(self.path):
-            path = os.path.join(self.path, file)
-
-            if 'README' in file:
-                self.readme = path
-            elif 'CHANGES' in file:
-                self.readme = path
-            elif 'participants.json' in file:
-                self.participants_json = path
-            elif 'participants.tsv' in file:
-                self.participants_tsv = path
+        self.readme = utils.check_file_exists(self.path, 'README')
+        self.changes = utils.check_file_exists(self.path, 'CHANGES')
+        self.participants_tsv = utils.check_file_exists(self.path, 'participants.tsv')
+        self.participants_json = utils.check_file_exists(self.path, 'participants.json')
 
         self.check_files()
+
+        print(self.changes)
 
     def check_files(self):
         error_values = [2, 4, 3, 3]
