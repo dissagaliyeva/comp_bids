@@ -27,14 +27,32 @@ class GlobalFiles:
 
         self.check_files()
 
-        print(self.changes)
-
     def check_files(self):
         error_values = [2, 4, 3, 3]
 
         for idx, file in enumerate([self.readme, self.changes, self.participants_json, self.participants_tsv]):
             if file is None:
                 utils.add_error(error_values[idx], self.path, GLOBAL_FILES[idx])
+            else:
+                if idx == 0:
+                    self.check_readme()
+                elif idx == 1:
+                    self.check_changes()
+                elif idx == 2:
+                    self.check_participants_json()
+                else:
+                    self.check_participants_tsv()
 
     def check_readme(self):
-        pass
+        ext = self.readme.split('.')[-1]
+        if ext not in ['rst', 'md', 'txt']:
+            utils.add_error(2, self.path, self.readme)
+
+        # open readme file
+        self.check_content(self.readme)
+
+    def check_content(self, file):
+        file = open(file).readlines()
+
+        if len(file) == 0:
+            utils.add_error(5, self.path, file)
