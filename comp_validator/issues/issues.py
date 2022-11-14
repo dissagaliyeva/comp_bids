@@ -12,5 +12,5 @@ ISSUE_LIST = {
     4: dict(key='CHANGES_FILE_MISSING', severity='warning', reason='The recommended file `CHANGES` is missing. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#changes">Section 03 (Modality agnostic files)</a> of the BIDS specification.'),
     5: dict(key='EMPTY_FILE', severity='warning', reason='Empty files not allowed.'),
     6: dict(key='CHANGES_FILE_WRONG_EXT', severity='warning', reason='The recommended file `CHANGES` has an incorrect extension. The accepted extension is `txt`. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#changes">Section 03 (Modality agnostic files)</a> of the BIDS specification.'),
-
+    7: dict(key='PARTICIPANTS_FILE_MISSING_PARTICIPANTS_ID', severity='error', reason='The recommended file `participants.tsv` does not have the required `participants_id` column. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#participants-file">Section 03 (Modality agnostic file)</a> of the BIDS specification.')
 }

@@ -1,4 +1,7 @@
 import os
+
+import pandas as pd
+
 from comp_validator import comp_validator as val
 from comp_validator import utils
 
@@ -38,10 +41,10 @@ class GlobalFiles:
                     self.check_readme()
                 elif idx == 1:
                     self.check_changes()
-                # elif idx == 2:
-                #     self.check_participants_json()
-                # else:
-                #     self.check_participants_tsv()
+                elif idx == 2:
+                    self.check_participants_json()
+                else:
+                    self.check_participants_tsv()
 
     def check_readme(self):
         ext = self.readme.split('.')[-1]
@@ -58,8 +61,14 @@ class GlobalFiles:
         # open readme file
         self.check_content(self.changes)
 
-    def check_participants_tsv(self):
+    def check_participants_json(self):
         pass
+
+    def check_participants_tsv(self):
+        file = pd.read_csv(self.participants_tsv)
+
+        if 'participant_id' not in file.columns:
+            utils.add_error(7, self.path, os.path.basename(self.participants_tsv))
 
     def check_content(self, file):
         f = open(file).readlines()
