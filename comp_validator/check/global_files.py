@@ -16,7 +16,7 @@ SPECIES = ['arabidopsis thaliana', 'bos taurus', 'caenorhabditis elegans', 'chla
            'homo sapiens', 'mus musculus', 'hepatitis C virus', 'mycoplasma pneumoniae', 'oryza sativa',
            'plasmodium falciparum', 'pneumocystis carinii', 'rattus norvegicus', 'saccharomyces cerevisiae',
            'schizosaccharomyces pombe', 'takifugu rubripes', 'xenopus laevis', 'zea mays']
-HANDEDNESS = ['left', 'l', 'right', 'r', 'a', 'ambidextrous', 'n/a']
+HANDEDNESS = ['left', 'l', 'right', 'r', 'a', 'ambidextrous', 'n/a', 'nan', None]
 
 class GlobalFiles:
     def __init__(self, path):
@@ -117,14 +117,16 @@ class GlobalFiles:
 
         for idx, content in file.iterrows():
             # check if species are defined correctly
-            if 'species' in content and content['species'] not in SPECIES:
-                utils.add_error(10, self.path, basename,
-                                f'Line: {idx}, subject: {content["participant_id"]}, species: {content["species"]}')
+            if 'species' in content:
+                if content['species'] not in SPECIES:
+                    utils.add_error(10, self.path, basename,
+                                    f'Line: {idx}, subject: {content["participant_id"]}, species: {content["species"]}')
 
             # check if age is of correct type
-            if 'age' in content and type(content['age']) != np.int64 or type(content['age']) != np.float64:
-                utils.add_error(11, self.path, basename,
-                                f'Line: {idx}, subject: {content["participant_id"]}, age: {content["age"]}')
+            if 'age' in content:
+                if type(content['age']) != np.int64 or type(content['age']) != np.float64:
+                    utils.add_error(11, self.path, basename,
+                                    f'Line: {idx}, subject: {content["participant_id"]}, age: {content["age"]}')
 
             # check if sex of correct type and if defined correctly
             if 'sex' in content:
@@ -132,7 +134,7 @@ class GlobalFiles:
                     utils.add_error(12, self.path, basename,
                                     f'Line: {idx}, subject: {content["participant_id"]}, sex: {content["sex"]}')
                 else:
-                    if content['sex'].lower() not in ['m', 'male', 'f', 'female', 'o', 'other', 'n/a']:
+                    if content['sex'].lower() not in ['m', 'male', 'f', 'female', 'o', 'other', 'n/a', None, 'nan']:
                         utils.add_error(13, self.path, basename,
                                         f'Line: {idx}, subject: {content["participant_id"]}, sex: {content["sex"]}')
 
