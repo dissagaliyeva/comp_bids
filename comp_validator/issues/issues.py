@@ -23,5 +23,7 @@ ISSUE_LIST = {
     15: dict(key='DATASET_DESCRIPTION_MISSING', severity='error', reason='The required file `dataset_description.json` is missing or has a wrong extension. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#dataset_descriptionjson">Section 03 (Modality agnostic files)</a> of the BIDS specificaiton.'),
     16: dict(key='PARTICIPANTS_FILE_MISSING_FIELDS', severity='warning', reason='The recommended file `participants.json` has missing values. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#participants-file">Section 03 (Modality agnostic file)</a> of the BIDS specification.'),
     17: dict(key='DATASET_DESCRIPTION_MISSING_FIELDS', severity='warning', reason='The required file `dataset_description.json` has missing values. See <a href="https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#dataset_descriptionjson">Section 03 (Modality agnostic files)</a> of the BIDS specification.'),
+    18: dict(key='JSON_FILE_ISSUES', severity='error', reason='The required file misses required fields in JSON file.'),
+    19: dict(key='DIMENSIONS_MISMATCH', severity='error', reason='The required JSON file has a mismatch in dimensions.'),
 
 }
