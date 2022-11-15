@@ -1,7 +1,7 @@
 import os
 import argparse
 
-from comp_validator.check import global_files
+from comp_validator.check import global_files, all_files
 from comp_validator.issues import issues
 
 # initiate argparse
@@ -19,6 +19,7 @@ ISSUES = {'error': {}, 'warning': {}}
 
 def validate(path):
     global_files.GlobalFiles(path)
+    all_files.Files(path)
 
     # write all issues in one file
     log()

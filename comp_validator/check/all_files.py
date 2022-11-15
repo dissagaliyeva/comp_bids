@@ -11,6 +11,10 @@ ROWS_COLUMNS = ['weights', 'distances', 'delays', 'speeds', 'times', 'nodes', 'l
 
 NxN_dim = ['weights', 'distances', 'delays', 'speeds', 'fc']
 Nx1_dim = ['times', 'areas', 'volumes', 'hemisphere']
+Nx2_dim = ['cartesian2d', 'polar2d']
+Nx3_dim = ['nodes', 'vertices', 'vnormals', 'fnormals', 'sensors', 'orientations', 'cartesian3d', 'polar3d']
+NxM_dim = ['map', 'faces']
+TxN_dim = ['vars', 'stimuli', 'noise', 'raster', 'emp', 'ts', 'events']
 
 
 class Files:
@@ -41,22 +45,22 @@ class Files:
                         utils.add_error(18, path, basename,
                                         evidence=f'`{basename}` does not have the required field `NumberOfColumns`.')
 
-                # check nxn dimensions
-                if get_rows_columns(file, NxN_dim):
-                    rows, columns = file['NumberOfRows'], file['NumberOfColumns']
-                    if rows != columns:
-                        utils.add_error(19, path, basename, evidence=f'`{basename}` has {rows}x{columns} dimensions. Expected to see nxn dimensions.')
+                # check dimensions
 
-                # check nx1 dimensions
-                if get_rows_columns(file, Nx1_dim):
-                    rows, columns = file['NumberOfRows'], file['NumberOfColumns']
-                    if rows != columns:
-                        utils.add_error(19, path, basename, evidence=f'`{basename}` has {rows}x{columns} dimensions. Expected to see nx1 dimensions.')
+                desc = '{} has {}x{} dimensions. Expected to see {}x{} dimensions.'
+                for idx, (dims, dim) in enumerate(zip([NxN_dim, Nx1_dim, Nx2_dim, Nx3_dim, NxM_dim],
+                                                      ['n', 1, 2, 3, 'm'])):
+                    if get_rows_columns(file, dims):
+                        rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
+
+                        if (dim == 'n' and rows != columns) or (dim != 'n' and rows == columns):
+                            utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
+
 
 
 def get_rows_columns(file, file_names):
     for name in file_names:
-        if name in file:
+        if name in file and 'tvb-framework' not in file:
             return True
 
     return False
