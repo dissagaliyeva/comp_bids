@@ -50,13 +50,31 @@ class Files:
 
                 if os.path.exists(os.path.join(path, 'nodes.json')) or os.path.exists(os.path.join(path, 'labels.json')) \
                     or os.path.exists(os.path.join(path, 'nodes.tsv')) or os.path.exists(os.path.join(path, 'labels.tsv')):
+                    self.coords = ['../coord/nodes.json', '../coord/labels.json']
                     self.coords_is_global = True
                 else:
                     utils.add_error(21, p, basename, f'{", ".join(self.coords)} must be in the global `coord` folder.')
             else:
-                print(coords)
+                p = os.path.basename(os.path.dirname(coords[0]))
 
-                self.coords_is_global = False
+                if self.check_nodes_labels():
+                    utils.add_error(22, p, basename, 'Nodes/Labels are not unique. Therefore they must be placed in the global `coord` folder.')
+                else:
+                    self.coords = ['../coord/nodes.json', '../coord/labels.json']
+                    self.coords_is_global = False
+
+    def check_nodes_labels(self):
+        unique = False
+
+        nodes = get_specific(self.content, 'nodes.tsv')
+        node0 = pd.read_csv(nodes[0], header=None, sep='\t')
+
+        if len(nodes) > 1:
+            unique = node0.equals(pd.read_csv(nodes[1], header=None, sep='\t'))
+            return unique
+        return unique
+
+
 
 
     def check_files(self):
@@ -89,15 +107,6 @@ class Files:
                                 utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
                         else:
                             check_rows_columns(jfile, path, basename)
-
-                # if get_rows_columns(file, TxN_dim):
-                #     if 'NumberOfRows' in jfile.keys() and 'NumberOfColumns' in jfile.keys():
-                #         rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
-                #
-                #         if rows == columns:
-                #             utils.add_error(19, path, basename, desc.format(basename, rows, columns, 't', 'n'))
-                #     else:
-                #         check_rows_columns(jfile, path, basename)
 
                 # check if CoordsRows and CoordsColumns are present
                 if get_rows_columns(file, COORDS):
