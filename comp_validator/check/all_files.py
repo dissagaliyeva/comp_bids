@@ -1,6 +1,8 @@
 import json
 import os
 import re
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from comp_validator import utils
@@ -74,14 +76,12 @@ class Files:
             return unique
         return unique
 
-
-
-
     def check_files(self):
         desc = '{} has {}x{} dimensions. Expected to see {}x{} dimensions.'
         coord_desc = '{} does not have the required field `CoordsRows` or `CoordsColumns`.'
 
         for file in self.content:
+            file = str(file)
             path, basename = os.path.dirname(file), os.path.basename(file)
 
             if file.endswith('json'):
@@ -124,8 +124,14 @@ class Files:
                     # TODO: check where global nodes/labels are located
                     pass
 
+                if '/eq/' in file:
+                    print('eq:', file)
 
-
+                    # check fo required fields
+                    for field in ['ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName',
+                                  'SoftwareRepository', 'Network']:
+                        if field not in jfile.keys():
+                            utils.add_error(18, path, basename, f'{basename} does not have the required `{field}` field.')
 
             if file.endswith('.tsv'):
                 # check dimensions
@@ -173,7 +179,7 @@ def get_files(path):
         for file in files:
             if 'tvb-framework' in root:
                 continue
-            contents.append(os.path.join(root, file))
+            contents.append(Path(os.path.join(root, file)))
 
     return contents
 
