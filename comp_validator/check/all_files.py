@@ -38,12 +38,7 @@ class Files:
 
                 # check if NumberOfRows & NumberOfColumns is present
                 if get_rows_columns(file, ROWS_COLUMNS):
-                    if 'NumberOfRows' not in jfile.keys():
-                        utils.add_error(18, path, basename,
-                                        evidence=f'`{basename}` does not have the required field `NumberOfRows`.')
-                    if 'NumberOfColumns' not in jfile.keys():
-                        utils.add_error(18, path, basename,
-                                        evidence=f'`{basename}` does not have the required field `NumberOfColumns`.')
+                    check_rows_columns(jfile, path, basename)
 
                 # check dimensions
 
@@ -51,20 +46,45 @@ class Files:
                 for idx, (dims, dim) in enumerate(zip([NxN_dim, Nx1_dim, Nx2_dim, Nx3_dim, NxM_dim],
                                                       ['n', 1, 2, 3, 'm'])):
                     if get_rows_columns(file, dims):
+                        if 'NumberOfRows' in jfile.keys() and 'NumberOfColumns' in jfile.keys():
+                            rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
+
+                            if (dim == 'n' and rows != columns) or (dim != 'n' and rows == columns):
+                                utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
+                        else:
+                            check_rows_columns(jfile, path, basename)
+
+                if get_rows_columns(file, TxN_dim):
+                    if 'NumberOfRows' in jfile.keys() and 'NumberOfColumns' in jfile.keys():
                         rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
 
-                        if (dim == 'n' and rows != columns) or (dim != 'n' and rows == columns):
-                            utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
+                        if rows == columns:
+                            utils.add_error(19, path, basename, desc.format(basename, rows, columns, 't', 'n'))
+                    else:
+                        check_rows_columns(jfile, path, basename)
 
+
+def check_rows_columns(jfile, path, basename):
+    if 'NumberOfRows' not in jfile.keys():
+        utils.add_error(18, path, basename,
+                        evidence=f'`{basename}` does not have the required field `NumberOfRows`.')
+    if 'NumberOfColumns' not in jfile.keys():
+        utils.add_error(18, path, basename,
+                        evidence=f'`{basename}` does not have the required field `NumberOfColumns`.')
 
 
 def get_rows_columns(file, file_names):
     for name in file_names:
         if name in file and 'tvb-framework' not in file:
-            return True
+            if name == 'ts':
+                if len(os.path.basename(file)) != 2 or '_ts.' not in file or '/ts' not in file:
+                    continue
+                else:
+                    return True
+            else:
+                return True
 
     return False
-
 
 
 def get_files(path):
@@ -72,6 +92,8 @@ def get_files(path):
 
     for root, dirs, files in os.walk(path):
         for file in files:
+            if 'tvb-framework' in root:
+                continue
             contents.append(os.path.join(root, file))
 
     return contents
