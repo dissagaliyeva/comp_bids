@@ -77,7 +77,7 @@ class GlobalFiles:
 
     def check_participants_json(self):
         file = json.load(open(self.participants_json))
-        basename = os.path.basename(file)
+        basename = os.path.basename(self.participants_json)
 
         if 'age' in file.keys():
             if 'Description' not in file['age'].keys():
@@ -146,7 +146,7 @@ class GlobalFiles:
 
     def check_dataset_desc(self):
         file = json.load(open(self.dataset_description))
-        basename = os.path.basename(file)
+        basename = os.path.basename(self.dataset_description)
 
         if 'Name' not in file.keys():
             utils.add_error(17, self.path, basename, 'Missing a required field `Name`.')
@@ -161,7 +161,7 @@ class GlobalFiles:
             utils.add_error(17, self.path, basename, 'A required field `BIDSVersion` should be of type string.')
 
         if 'HEDVersion' in file.keys() and (type(file['HEDVersion']) != str or type(file['HEDVersion'] != list)):
-            utils.add_error(17, self.path, basename, 'A recommended field `HEDVersion` should be of type string or list of strings.')
+            utils.add_error(17, self.path, basename, 'A recommended field `HEDVersion` should be of type string or array of strings.')
 
         if 'DatasetLinks' in file.keys() and (type(file['DatasetLinks']) != object):
             utils.add_error(17, self.path, basename, 'A recommended field `DatasetLinks` should be of type object.')
@@ -173,7 +173,7 @@ class GlobalFiles:
             utils.add_error(17, self.path, basename, 'A recommended field `License` should be of type string.')
 
         if 'Authors' in file.keys() and (type(file['Authors']) != list):
-            utils.add_error(17, self.path, basename, 'A recommended field `Authors` should be of type list of strings.')
+            utils.add_error(17, self.path, basename, 'A recommended field `Authors` should be of type array of strings.')
 
         if 'Acknowledgements' in file.keys() and type(file['Acknowledgements']) != str:
             utils.add_error(17, self.path, basename, 'A recommended field `Acknowledgements` should be of type string.')
@@ -182,22 +182,22 @@ class GlobalFiles:
             utils.add_error(17, self.path, basename, 'A recommended field `HowToAcknowledge` should be of type string.')
 
         if 'Funding' in file.keys() and type(file['Funding']) != list:
-            utils.add_error(17, self.path, basename, 'A recommended field `Funding` should be of type list.')
+            utils.add_error(17, self.path, basename, 'A recommended field `Funding` should be of type array.')
 
         if 'EthicsApproval' in file.keys() and type(file['EthicsApproval']) != list:
-            utils.add_error(17, self.path, basename, 'A recommended field `EthicsApproval` should be of type list.')
+            utils.add_error(17, self.path, basename, 'A recommended field `EthicsApproval` should be of type array.')
 
         if 'ReferencesAndLinks' in file.keys() and type(file['ReferencesAndLinks']) != list:
-            utils.add_error(17, self.path, basename, 'A recommended field `ReferencesAndLinks` should be of type list.')
+            utils.add_error(17, self.path, basename, 'A recommended field `ReferencesAndLinks` should be of type array.')
 
         if 'DatasetDOI' in file.keys() and type(file['DatasetDOI']) != str:
             utils.add_error(17, self.path, basename, 'A recommended field `DatasetDOI` should be of type string.')
 
         if 'GeneratedBy' in file.keys() and type(file['GeneratedBy']) != list:
-            utils.add_error(17, self.path, basename, 'A recommended field `GeneratedBy` should be of type list.')
+            utils.add_error(17, self.path, basename, 'A recommended field `GeneratedBy` should be of type array.')
 
         if 'SourceDatasets' in file.keys() and type(file['SourceDatasets']) != list:
-            utils.add_error(17, self.path, basename, 'A recommended field `SourceDatasets` should be of type list.')
+            utils.add_error(17, self.path, basename, 'A recommended field `SourceDatasets` should be of type array.')
 
     def check_content(self, file):
         f = open(file).readlines()

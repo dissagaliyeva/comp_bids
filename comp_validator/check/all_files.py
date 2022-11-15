@@ -49,11 +49,13 @@ class Files:
                 p = os.path.basename(os.path.dirname(coords[0]))
 
                 if os.path.exists(os.path.join(path, 'nodes.json')) or os.path.exists(os.path.join(path, 'labels.json')) \
-                    or os.path.exists(os.path.join(path,'nodes.tsv')) or os.path.exists(os.path.join(path, 'labels.tsv')):
+                    or os.path.exists(os.path.join(path, 'nodes.tsv')) or os.path.exists(os.path.join(path, 'labels.tsv')):
                     self.coords_is_global = True
                 else:
                     utils.add_error(21, p, basename, f'{", ".join(self.coords)} must be in the global `coord` folder.')
             else:
+                print(coords)
+
                 self.coords_is_global = False
 
 
@@ -88,14 +90,14 @@ class Files:
                         else:
                             check_rows_columns(jfile, path, basename)
 
-                if get_rows_columns(file, TxN_dim):
-                    if 'NumberOfRows' in jfile.keys() and 'NumberOfColumns' in jfile.keys():
-                        rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
-
-                        if rows == columns:
-                            utils.add_error(19, path, basename, desc.format(basename, rows, columns, 't', 'n'))
-                    else:
-                        check_rows_columns(jfile, path, basename)
+                # if get_rows_columns(file, TxN_dim):
+                #     if 'NumberOfRows' in jfile.keys() and 'NumberOfColumns' in jfile.keys():
+                #         rows, columns = jfile['NumberOfRows'], jfile['NumberOfColumns']
+                #
+                #         if rows == columns:
+                #             utils.add_error(19, path, basename, desc.format(basename, rows, columns, 't', 'n'))
+                #     else:
+                #         check_rows_columns(jfile, path, basename)
 
                 # check if CoordsRows and CoordsColumns are present
                 if get_rows_columns(file, COORDS):
@@ -104,7 +106,7 @@ class Files:
 
                         if not isinstance(rows, list) or not isinstance(columns, list):
                             utils.add_error(20, path, basename,
-                                            f'{basename}\'s `CoordsRows` and `CoordsColumns` must be of type list.')
+                                            f'{basename}\'s `CoordsRows` and `CoordsColumns` must be of type array.')
                     else:
                         utils.add_error(18, path, basename, coord_desc.format(basename))
 

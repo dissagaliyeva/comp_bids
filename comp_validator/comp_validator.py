@@ -4,16 +4,6 @@ import argparse
 from comp_validator.check import global_files, all_files
 from comp_validator.issues import issues
 
-# initiate argparse
-# parser = argparse.ArgumentParser()
-# parser.add_argument('path', help='path to the converted folder', type=str)
-
-# set up a global counter for showing number of errors
-ERROR = 1
-
-# set up a global counter for showing number of warnings
-WARNING = 1
-
 ISSUES = {'error': {}, 'warning': {}}
 
 
@@ -41,41 +31,4 @@ def log():
 
             for value in ISSUES['warning'][code]:
                 file.write(value)
-
-    print(ISSUES)
-
-    # for issue in ISSUES.keys():
-    #     with open(f'{issue}.txt', 'a') as file:
-    #         for code in ISSUES[issue]:
-    #             file.write(f'### Error {ERROR}')
-    #             for value in ISSUES[issue][code]:
-
-        
-
-
-# def write_error(num, path):
-#     global ERROR, WARNING
-#
-#     issue, basename = issues.ISSUE_LIST[num], os.path.basename(path)
-#     err_type = issue['severity']
-#
-# #     with open(f'{err_type}.txt', 'a') as file:
-# #         error = ERROR if err_type == 'error' else WARNING
-# #         file.write(f"""
-# # {err_type.casefold()} {error}: [Code {num}] {issue['key']}
-# # {issue['reason']}\n
-# #
-# # {basename}
-# # Location:
-# # {path}
-# #
-# # Reason:
-# # {issue['reason']}
-# # =============================================================\n\n\n
-# #         """)
-#
-#     if err_type == 'error':
-#         ERROR += 1
-#     else:
-#         WARNING += 1
 
