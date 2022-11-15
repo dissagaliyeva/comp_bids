@@ -127,11 +127,21 @@ class Files:
                 if '/eq/' in file:
                     print('eq:', file)
 
+                    types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
+
                     # check fo required fields
-                    for field in ['ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion', 'SoftwareName',
-                                  'SoftwareRepository', 'Network']:
+                    for idx, field in enumerate(['ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
+                                                 'SoftwareName', 'SoftwareRepository', 'Network']):
                         if field not in jfile.keys():
                             utils.add_error(18, path, basename, f'{basename} does not have the required `{field}` field.')
+
+                        if types[idx] == 'arr/str' and field in jfile.keys():
+                            if not isinstance(jfile[field], list) or not isinstance(jfile[field], str):
+                                utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type array or string.')
+                        elif types[idx] == 'str' and field in jfile.keys():
+                            if not isinstance(jfile[field], str):
+                                utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type string.')
+
 
             if file.endswith('.tsv'):
                 # check dimensions
