@@ -26,13 +26,12 @@ class Files:
         self.path = path
         self.content = get_files(path)
 
-        # check all json files
-        self.check_files()
-
         # check where nodes/labels are
-        self.coords = None
         self.coords_is_global = None
         self.find_coords()
+
+        # check all json files
+        self.check_files()
 
     def find_coords(self):
         coords = []
@@ -50,9 +49,7 @@ class Files:
             if 'sub-' not in coords[0].lower():
                 p = os.path.basename(os.path.dirname(coords[0]))
 
-                if os.path.exists(os.path.join(path, 'nodes.json')) or os.path.exists(os.path.join(path, 'labels.json')) \
-                    or os.path.exists(os.path.join(path, 'nodes.tsv')) or os.path.exists(os.path.join(path, 'labels.tsv')):
-                    self.coords = ['../coord/nodes.json', '../coord/labels.json']
+                if len(get_specific(self.content, 'nodes')) == 1:
                     self.coords_is_global = True
                 else:
                     utils.add_error(21, p, basename, f'{", ".join(self.coords)} must be in the global `coord` folder.')
@@ -61,9 +58,9 @@ class Files:
 
                 if self.check_nodes_labels():
                     utils.add_error(22, p, basename, 'Nodes/Labels are not unique. Therefore they must be placed in the global `coord` folder.')
-                else:
-                    self.coords = ['../coord/nodes.json', '../coord/labels.json']
                     self.coords_is_global = False
+                else:
+                    self.coords_is_global = True
 
     def check_nodes_labels(self):
         unique = False
@@ -122,7 +119,17 @@ class Files:
                 # check coordinates folder
                 if 'coord' in file:
                     # TODO: check where global nodes/labels are located
-                    pass
+
+
+                    # check for required fields
+                    if 'Units' not in jfile.keys():
+                        utils.add_error(18, path, basename, f'{basename} does not have the required `Units` field.')
+                    if 'AnatomicalLandmarkCoordinates' in jfile.keys():
+                        check_arr_str(jfile, path, basename, 'AnatomicalLandmarkCoordinates')
+
+                    for field in ['AnatomicalLandmarkCoordinateSystem', 'AnatomicalLandmarkCoordinateUnits', 'AnatomicalLandmarkCoordinateSystemDescription']:
+                        check_str_type(jfile, path, basename, field)
+
 
                 if 'spatial' in file or '/ts/' in file:
                     types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
@@ -141,6 +148,12 @@ class Files:
                     # check recommended field
                     if 'CoordsSeries' in jfile.keys():
                         check_arr_str(jfile, path, basename, 'CoordsSeries')
+
+                    if 'SamplingPeriod' in jfile.keys():
+                        check_int_type(jfile, path, basename, 'SamplingPeriod')
+
+                    if 'SamplingFrequency' in jfile.keys():
+                        check_int_type(jfile, path, basename, 'SamplingFrequency')
 
                 if 'param' in file or 'eq' in file or 'code' in file:
                     types = ['arr/str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str']
@@ -187,6 +200,11 @@ def check_str_type(jfile, path, basename, field):
     if not isinstance(jfile[field], str):
         utils.add_error(20, path, basename,
                         f'{basename}\'s {field} must be of type string.')
+
+
+def check_int_type(jfile, path, basename, field):
+    if not isinstance(jfile[field], int) or not isinstance(jfile[field], float):
+        utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type int or float.')
 
 
 def check_rows_columns(jfile, path, basename):
