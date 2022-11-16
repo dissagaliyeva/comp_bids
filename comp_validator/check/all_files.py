@@ -43,7 +43,6 @@ class Files:
                 coords.append(file)
 
         if coords:
-            self.coords = coords
             path, basename = os.path.dirname(coords[0]), os.path.basename(coords[0])
 
             if 'sub-' not in coords[0].lower():
@@ -58,9 +57,9 @@ class Files:
 
                 if self.check_nodes_labels():
                     utils.add_error(22, p, basename, 'Nodes/Labels are not unique. Therefore they must be placed in the global `coord` folder.')
-                    self.coords_is_global = False
-                else:
                     self.coords_is_global = True
+                else:
+                    self.coords_is_global = False
 
     def check_nodes_labels(self):
         unique = False
@@ -69,13 +68,14 @@ class Files:
         node0 = pd.read_csv(nodes[0], header=None, sep='\t')
 
         if len(nodes) > 1:
-            unique = node0.equals(pd.read_csv(nodes[1], header=None, sep='\t'))
-            return unique
+            return node0.equals(pd.read_csv(nodes[1], header=None, sep='\t'))
         return unique
 
     def check_files(self):
         desc = '{} has {}x{} dimensions. Expected to see {}x{} dimensions.'
         coord_desc = '{} does not have the required field `CoordsRows` or `CoordsColumns`.'
+        text = 'Nodes/Labels should be in the global folder. Therefore, CoordsRows and CoordsColumns must point to the location. Here it should be:\nCoordsRows: ["../../../coord/nodes.json, "../../../coord/labels.json]. The same must be for CoordsColumns.'
+        text2 = 'Nodes/Labels should be in the global folder. Therefore, CoordsRows and CoordsColumns must point to the location. Here it should be:\nCoordsRows: ["../coord/nodes.json, "../coord/labels.json]. The same must be for CoordsColumns.'
 
         for file in self.content:
             file = str(file)
@@ -112,14 +112,17 @@ class Files:
 
                         if not isinstance(rows, list) or not isinstance(columns, list):
                             utils.add_error(20, path, basename,
-                                            f'{basename}\'s `CoordsRows` and `CoordsColumns` must be of type array.')
+                                            f'`CoordsRows` and `CoordsColumns` must be of type array.')
                     else:
                         utils.add_error(18, path, basename, coord_desc.format(basename))
 
                 # check coordinates folder
                 if 'coord' in file:
-                    # TODO: check where global nodes/labels are located
-
+                    if self.coords_is_global and 'sub-' in file.lower():
+                        if 'CoordsRows' not in jfile.keys():
+                            utils.add_error(18, path, basename, text)
+                        if 'CoordsColumns' not in jfile.keys():
+                            utils.add_error(18, path, basename, text)
 
                     # check for required fields
                     if 'Units' not in jfile.keys():
@@ -128,8 +131,8 @@ class Files:
                         check_arr_str(jfile, path, basename, 'AnatomicalLandmarkCoordinates')
 
                     for field in ['AnatomicalLandmarkCoordinateSystem', 'AnatomicalLandmarkCoordinateUnits', 'AnatomicalLandmarkCoordinateSystemDescription']:
-                        check_str_type(jfile, path, basename, field)
-
+                        if field in jfile.keys():
+                            check_str_type(jfile, path, basename, field)
 
                 if 'spatial' in file or '/ts/' in file:
                     types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
@@ -172,8 +175,18 @@ class Files:
                             else:
                                 check_str_type(jfile, path, basename, field)
 
-
-
+                # check CoordsRows & CoordsColumns
+                if 'net' in file or 'spatial' in file or '/ts/' in file:
+                    if self.coords_is_global:
+                        if 'CoordsRows' not in jfile.keys():
+                            utils.add_error(18, path, basename, text)
+                        if 'CoordsColumns' not in jfile.keys():
+                            utils.add_error(18, path, basename, text)
+                    elif self.coords_is_global is False:
+                        if 'CoordsRows' not in jfile.keys():
+                            utils.add_error(18, path, basename, text2)
+                        if 'CoordsColumns' not in jfile.keys():
+                            utils.add_error(18, path, basename, text2)
 
             if file.endswith('.tsv'):
                 # check dimensions
@@ -193,18 +206,18 @@ def check_arr_str(jfile, path, basename, field):
     elif type(jfile[field]) == list:
         return
     else:
-        utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type array or string.')
+        utils.add_error(20, path, basename, f'{field} field must be of type array or string.')
 
 
 def check_str_type(jfile, path, basename, field):
     if not isinstance(jfile[field], str):
         utils.add_error(20, path, basename,
-                        f'{basename}\'s {field} must be of type string.')
+                        f'{field} field must be of type string.')
 
 
 def check_int_type(jfile, path, basename, field):
     if not isinstance(jfile[field], int) or not isinstance(jfile[field], float):
-        utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type int or float.')
+        utils.add_error(20, path, basename, f'{field} field must be of type int or float.')
 
 
 def check_rows_columns(jfile, path, basename):
