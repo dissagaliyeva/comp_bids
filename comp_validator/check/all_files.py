@@ -144,6 +144,15 @@ class Files:
                             if not isinstance(jfile[field], str):
                                 utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type string.')
 
+                    # check recommended field
+                    if 'CoordsSeries' in jfile.keys():
+                        if type(jfile['CoordsSeries']) == str:
+                            continue
+                        elif type(jfile['CoordsSeries']) == list:
+                            continue
+                        else:
+                            utils.add_error(20, path, basename, f'{basename}\'s CoordsSeries must be of type array or string.')
+
                 if 'param' in file or 'eq' in file:
                     types = ['arr/str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str']
                     field0 = 'ModelEq' if 'param' in file else 'ModelParam'
