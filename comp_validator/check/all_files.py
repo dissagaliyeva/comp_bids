@@ -51,7 +51,7 @@ class Files:
                 if len(get_specific(self.content, 'nodes')) == 1:
                     self.coords_is_global = True
                 else:
-                    utils.add_error(21, p, basename, f'{", ".join(self.coords)} must be in the global `coord` folder.')
+                    utils.add_error(21, p, basename, f'coordinates (nodes/labels) must be in the global `coord` folder.')
             else:
                 p = os.path.basename(os.path.dirname(coords[0]))
 
