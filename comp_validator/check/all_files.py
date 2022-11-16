@@ -124,7 +124,7 @@ class Files:
                     # TODO: check where global nodes/labels are located
                     pass
 
-                if 'spatial' in file:
+                if 'spatial' in file or '/ts/' in file:
                     types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
 
                     # check fo required fields
@@ -132,26 +132,15 @@ class Files:
                                                  'SoftwareName', 'SoftwareRepository', 'Network', 'ModelEq']):
                         if field not in jfile.keys():
                             utils.add_error(18, path, basename, f'{basename} does not have the required `{field}` field.')
-
-                        if types[idx] == 'arr/str' and field in jfile.keys():
-                            if type(jfile[field]) == str:
-                                continue
-                            elif type(jfile[field]) == list:
-                                continue
+                        else:
+                            if types[idx] == 'arr/str':
+                                check_arr_str(jfile, path, basename, field)
                             else:
-                                utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type array or string.')
-                        elif types[idx] == 'str' and field in jfile.keys():
-                            if not isinstance(jfile[field], str):
-                                utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type string.')
+                                check_str_type(jfile, path, basename, field)
 
                     # check recommended field
                     if 'CoordsSeries' in jfile.keys():
-                        if type(jfile['CoordsSeries']) == str:
-                            continue
-                        elif type(jfile['CoordsSeries']) == list:
-                            continue
-                        else:
-                            utils.add_error(20, path, basename, f'{basename}\'s CoordsSeries must be of type array or string.')
+                        check_arr_str(jfile, path, basename, 'CoordsSeries')
 
                 if 'param' in file or 'eq' in file or 'code' in file:
                     types = ['arr/str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str']
@@ -166,17 +155,10 @@ class Files:
                         # check recommended field
                         if field in jfile.keys():
                             if types[idx] == 'arr/str':
-                                if type(jfile[field]) == str:
-                                    continue
-                                elif type(jfile[field]) == list:
-                                    continue
-                                else:
-                                    utils.add_error(20, path, basename,
-                                                    f'{basename}\'s {field} must be of type array or string.')
-                            elif types[idx] == 'str':
-                                if not isinstance(jfile[field], str):
-                                    utils.add_error(20, path, basename,
-                                                    f'{basename}\'s {field} must be of type string.')
+                                check_arr_str(jfile, path, basename, field)
+                            else:
+                                check_str_type(jfile, path, basename, field)
+
 
 
 
@@ -190,6 +172,21 @@ class Files:
                         if (dim == 'n' and rows != columns) or (dim != 'n' and rows == columns) or \
                                 (rows == 1):
                             utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
+
+
+def check_arr_str(jfile, path, basename, field):
+    if type(jfile[field]) == str:
+        return
+    elif type(jfile[field]) == list:
+        return
+    else:
+        utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type array or string.')
+
+
+def check_str_type(jfile, path, basename, field):
+    if not isinstance(jfile[field], str):
+        utils.add_error(20, path, basename,
+                        f'{basename}\'s {field} must be of type string.')
 
 
 def check_rows_columns(jfile, path, basename):
