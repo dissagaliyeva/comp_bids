@@ -124,7 +124,7 @@ class Files:
                     # TODO: check where global nodes/labels are located
                     pass
 
-                if 'code' in file:
+                if 'spatial' in file:
                     types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
 
                     # check fo required fields
@@ -153,9 +153,9 @@ class Files:
                         else:
                             utils.add_error(20, path, basename, f'{basename}\'s CoordsSeries must be of type array or string.')
 
-                if 'param' in file or 'eq' in file:
+                if 'param' in file or 'eq' in file or 'code' in file:
                     types = ['arr/str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str']
-                    field0 = 'ModelEq' if 'param' in file else 'ModelParam'
+                    field0 = 'ModelEq' if 'eq' not in file else 'ModelParam'
 
                     for idx, field in enumerate([field0, 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
                                                  'SoftwareName', 'SoftwareRepository']):
