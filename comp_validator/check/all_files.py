@@ -88,7 +88,7 @@ class Files:
                 jfile = json.load(open(file))
 
                 # check if Description field is present
-                if 'Description' not in jfile.keys():
+                if 'Description' not in jfile.keys() and (not 'participants' in file and not 'dataset' in file):
                     utils.add_error(18, path, basename,
                                     evidence=f'{basename} does not have the required field `Description`.')
 
@@ -124,23 +124,51 @@ class Files:
                     # TODO: check where global nodes/labels are located
                     pass
 
-                if '/eq/' in file:
-                    print('eq:', file)
-
+                if 'code' in file:
                     types = ['arr/str', 'str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str', 'arr/str', 'arr/str']
 
                     # check fo required fields
                     for idx, field in enumerate(['ModelParam', 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
-                                                 'SoftwareName', 'SoftwareRepository', 'Network']):
+                                                 'SoftwareName', 'SoftwareRepository', 'Network', 'ModelEq']):
                         if field not in jfile.keys():
                             utils.add_error(18, path, basename, f'{basename} does not have the required `{field}` field.')
 
                         if types[idx] == 'arr/str' and field in jfile.keys():
-                            if not isinstance(jfile[field], list) or not isinstance(jfile[field], str):
+                            if type(jfile[field]) == str:
+                                continue
+                            elif type(jfile[field]) == list:
+                                continue
+                            else:
                                 utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type array or string.')
                         elif types[idx] == 'str' and field in jfile.keys():
                             if not isinstance(jfile[field], str):
                                 utils.add_error(20, path, basename, f'{basename}\'s {field} must be of type string.')
+
+                if 'param' in file or 'eq' in file:
+                    types = ['arr/str', 'arr/str', 'str', 'str', 'arr/str', 'arr/str']
+                    field0 = 'ModelEq' if 'param' in file else 'ModelParam'
+
+                    for idx, field in enumerate([field0, 'SourceCode', 'SourceCodeVersion', 'SoftwareVersion',
+                                                 'SoftwareName', 'SoftwareRepository']):
+                        # check required field
+                        if field not in jfile.keys() and idx == 0:
+                            utils.add_error(18, path, basename, f'{basename} does not have the required `{field}` field.')
+
+                        # check recommended field
+                        if field in jfile.keys():
+                            if types[idx] == 'arr/str':
+                                if type(jfile[field]) == str:
+                                    continue
+                                elif type(jfile[field]) == list:
+                                    continue
+                                else:
+                                    utils.add_error(20, path, basename,
+                                                    f'{basename}\'s {field} must be of type array or string.')
+                            elif types[idx] == 'str':
+                                if not isinstance(jfile[field], str):
+                                    utils.add_error(20, path, basename,
+                                                    f'{basename}\'s {field} must be of type string.')
+
 
 
             if file.endswith('.tsv'):
@@ -153,10 +181,6 @@ class Files:
                         if (dim == 'n' and rows != columns) or (dim != 'n' and rows == columns) or \
                                 (rows == 1):
                             utils.add_error(19, path, basename, desc.format(basename, rows, columns, 'n', dim))
-
-                if get_rows_columns(file, TxN_dim) or (rows == 1 or columns == 1):
-                    if rows == columns:
-                        utils.add_error(19, path, basename, desc.format(basename, rows, columns, 't', 'n'))
 
 
 def check_rows_columns(jfile, path, basename):
@@ -189,7 +213,7 @@ def get_files(path):
         for file in files:
             if 'tvb-framework' in root:
                 continue
-            contents.append(Path(os.path.join(root, file)))
+            contents.append(str(Path(os.path.join(root, file))))
 
     return contents
 
