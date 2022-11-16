@@ -4,7 +4,7 @@ requirements = ['numpy', 'pandas']
 
 setup(
     name='comp_validator',
-    version='0.0.1',
+    version='0.1.0',
     description='BIDS-validator for computational data (simulations).',
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

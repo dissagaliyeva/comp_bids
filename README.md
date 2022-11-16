@@ -10,7 +10,9 @@ The project is very fresh and under active development. However, you can already
 
 Simply run the following command to get the app up and running:
 
-`pip install comp_validator`
+```python
+!pip install comp_validator
+```
 
 You can either find a notebook with instructions to run the app or follow the lines below:
 
