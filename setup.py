@@ -5,8 +5,8 @@ requirements = ['numpy']
 setup(
     name='comp_validator',
     version='0.0.1',
-    description='BIDS validator for computational data (simulations).',
-    # long_description=
+    description='BIDS-validator for computational data (simulations).',
+    long_description=open("README.md").read(),
     author='Dinara Issagaliyeva',
     author_email='dinarissaa@gmail.com',
     python_requires='>=3.6',
